@@ -1,0 +1,17 @@
+[
+    {
+        "name" : "Bay Area Warehouse",
+        "location" : "Bay Area",
+        "size" : 5000,
+        "price" : 1000,
+        "type" : "General",
+        "features" : ["Security Features", "Office Space"],
+        "lease" : "Long Term",
+        "closest-highway" : 30,
+        "closest-port" : 70,
+        "access" : ["Truck"],
+        "special perks" : ["Hazardous Material Storage", "Food Grade Compliance"],
+        "availability" : ["Immediate", "Future"],
+        "additional" : ["Logistics and Transportation Services", "Staff and Labor Availability"]
+    }
+]

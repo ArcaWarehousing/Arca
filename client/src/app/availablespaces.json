@@ -1,0 +1,17 @@
+[
+    {
+        "name" : "Bay Area Warehouse",
+        "location" : "1234 Street Road",
+        "size" : 5000,
+        "price" : 1000,
+        "type" : "General",
+        "features" : ["Security Features", "Office Space"],
+        "lease" : "Long Term",
+        "closestHighway" : 30,
+        "closestPort" : 70,
+        "access" : ["Truck"],
+        "specialPerks" : ["Hazardous Material Storage", "Food Grade Compliance"],
+        "availability" : ["Immediate", "Future"],
+        "additional" : ["Logistics and Transportation Services", "Staff and Labor Availability"]
+    }
+]

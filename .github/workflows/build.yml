@@ -1,0 +1,36 @@
+# Simple workflow for deploying static content to GitHub Pages
+name: Setup serverComp for website
+run-name: ${{ github.actor }} is deploying to the server 
+on:
+  push:
+    branches: ['prod']
+
+jobs:
+  run_example_job:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+    - name: print out example job
+      uses: appleboy/ssh-action@v0.1.10
+      with:
+        host: 68.183.240.118 
+        username: root
+        key: ${{ secrets.GHACTIONSKEYPRIV }}
+        port: 22
+        command_timeout: 30m
+        script: | 
+          docker rm -f $(docker ps -a -q)  
+          rm -r marketMaker
+          git clone -b prod git@github.com-repo-0:RealEstateBoys/marketMaker.git
+          cd marketMaker
+          cd server
+          docker build -t arca-backend-server .
+          docker run -p 27017:27017 -p 9000:9000 arca-backend-server &
+          cd ..
+          cd client
+          docker build -t arca-frontend-server .
+          docker run -p 80:3000 arca-frontend-server &
+          cd ..
+          echo "Build Completed!"
+          exit
+          return
