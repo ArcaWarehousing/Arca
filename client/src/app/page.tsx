@@ -4,10 +4,10 @@ import React from "react";
 import { domAnimation, LazyMotion, m } from "framer-motion";
 import Nav2 from "./components/nav/navbar2";
 import Footer from "./components/footer";
-import MoreFeatures from "./components/MoreFeatures";
+import MoreFeatures from "./components/moreFeatures";
 import Features from "./components/features";
 import Search from "./components/searchitems/search";
-import SearchBar from "./components/landingbar";
+import SearchBar from "./components/searchbar";
 
 const LandingPage: React.FC = () => {
   const handleSearch = (query: string) => {

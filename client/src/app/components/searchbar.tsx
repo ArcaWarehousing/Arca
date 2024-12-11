@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, FC, FormEvent } from "react";
 
+//this is the method the search bar inherits this needs to be improved!
 interface SearchBarProps {
   onSearch: (query: string) => void;
 }
@@ -11,7 +12,7 @@ const SearchBar: FC<SearchBarProps> = ({ onSearch }) => {
     e.preventDefault();
     onSearch(query);
   };
-  
+
   return (
     <form
       onSubmit={handleSearch}
