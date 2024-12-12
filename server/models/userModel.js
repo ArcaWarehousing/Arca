@@ -6,12 +6,12 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    password : {
-        type: String, 
+    password: {//this should be hashed or encrypted! Do not remove this comment unless that is done!
+        type: String,
         required: true
     },
-    email : {
-        type: String, 
+    email: {
+        type: String,
         required: true
     },
 
@@ -36,7 +36,7 @@ const userSchema = new mongoose.Schema({
         required: false,
         default: ""
     },
-    
+
     // Buyer Fields
     ownedGoods: {
         type: [String], //TODO: Make Schema
@@ -52,7 +52,7 @@ const userSchema = new mongoose.Schema({
         required: false
     },
     ownedWarehouses: {
-        type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'warehouses'}],
+        type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'warehouses' }],
         required: false,
         default: []
     },
@@ -80,7 +80,7 @@ const userSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     }
-    
+
 }, {
     timestamps: true
 });

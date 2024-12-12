@@ -9,7 +9,7 @@ function Page() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState<null | string>(null);
   const router = useRouter();
-  if(Cookies.get("authToken")) router.push("/welcome");
+  if (Cookies.get("authToken")) router.push("/welcome");
   // console.log("Process: " + process.env.NEXT_PUBLIC_APIROUTE);
 
   const handleForm = async (event: { preventDefault: () => void }) => {
@@ -28,7 +28,7 @@ function Page() {
         body: JSON.stringify({
           email: email,
           password: password,
-          rememberMe: true,
+          rememberMe: true, //hard coded
         }),
       });
 
