@@ -24,33 +24,33 @@ const Page = () => {
 
   const authToken = Cookies.get("authToken");
   const router = useRouter();
-  const fetchData = async () => {
-    try {
-      if (!authToken) {
-        console.log("REDIRECTING TO SIGNIN");
-        router.push("/signin");
-      } else {
-        const response = await fetch(
-          process.env.NEXT_PUBLIC_APIROUTE + ":9000/api/user/getProfile",
-          {
-            credentials: "include"
-          }
-        );
+  // const fetchData = async () => { UNCOMMENT ME to enable signin
+  //   try {
+  //     if (!authToken) {
+  //       console.log("REDIRECTING TO SIGNIN");
+  //       router.push("/signin");
+  //     } else {
+  //       const response = await fetch(
+  //         process.env.NEXT_PUBLIC_APIROUTE + ":9000/api/user/getProfile",
+  //         {
+  //           credentials: "include"
+  //         }
+  //       );
 
-        if (response.ok) {
-          const data = await response.json();
-          setUserName(data.email);
+  //       if (response.ok) {
+  //         const data = await response.json();
+  //         setUserName(data.email);
 
-          // Handle insuranceFile if needed
-          // console.log("Data fetched successfully", data);
-        } else {
-          console.error("Error fetching data");
-        }
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  //         // Handle insuranceFile if needed
+  //         // console.log("Data fetched successfully", data);
+  //       } else {
+  //         console.error("Error fetching data");
+  //       }
+  //     }
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
   const handleForm = async (event: { preventDefault: () => void }) => {
     event.preventDefault();
 
@@ -92,7 +92,7 @@ const Page = () => {
   };
 
   useEffect(() => {
-    fetchData();
+    //fetchData(); UNCOMMENT ME TO FETCH DATA
   }, []);
   return (
     <div className="flex flex-row w-full h-screen  ">

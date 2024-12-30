@@ -19,43 +19,43 @@ function Profile() {
 
   const authToken = Cookies.get("authToken");
 
-  const fetchData = useCallback(async () => {
-    try {
-      if (!authToken) {
-        console.log("REDIRECTING TO SIGNIN");
-        router.push("/signin");
-      } else {
-        const response = await fetch(
-          process.env.NEXT_PUBLIC_APIROUTE + ":9000/api/user/getProfile",
-          {
-            credentials: "include",
-          }
-        );
+  // const fetchData = useCallback(async () => {
+  // try {
+  //   if (!authToken) {
+  //     console.log("REDIRECTING TO SIGNIN");
+  //     router.push("/signin");
+  //   } else {
+  //     const response = await fetch(
+  //       process.env.NEXT_PUBLIC_APIROUTE + ":9000/api/user/getProfile",
+  //       {
+  //         credentials: "include",
+  //       }
+  //     );
 
-        if (response.ok) {
-          const data = await response.json();
-          setFirstName(data.firstName);
-          setLastName(data.lastName);
-          setEmail(data.email);
-          setPhoneNumber(data.phoneNumber);
-          setCompanyName(data.companyName);
-          setVerifiedToSell(data.verifiedToSell);
-          setVerifiedToBuy(data.verifiedToBuy);
-          setVerificationRequested(data.verificationRequested);
-          // Handle insuranceFile if needed
-          console.log("Data fetched successfully", data);
-        } else {
-          console.error("Error fetching data");
-        }
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  }, [authToken, router]);
+  //     if (response.ok) {
+  //       const data = await response.json();
+  //       setFirstName(data.firstName);
+  //       setLastName(data.lastName);
+  //       setEmail(data.email);
+  //       setPhoneNumber(data.phoneNumber);
+  //       setCompanyName(data.companyName);
+  //       setVerifiedToSell(data.verifiedToSell);
+  //       setVerifiedToBuy(data.verifiedToBuy);
+  //       setVerificationRequested(data.verificationRequested);
+  //       // Handle insuranceFile if needed
+  //       console.log("Data fetched successfully", data);
+  //     } else {
+  //       console.error("Error fetching data");
+  //     }
+  //   }
+  // } catch (error) {
+  //   console.log(error);
+  // }
+  // }, [authToken, router]);
 
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+  // useEffect(() => {
+  //   fetchData();
+  // }, [fetchData]);
 
   const handleChange = (setter: React.SetStateAction<any>) => (e: React.ChangeEvent<HTMLInputElement>) => {
     setter(e.target.value);
@@ -118,7 +118,7 @@ function Profile() {
     }
   };
 
-  
+
 
   const requestVerification = async () => {
     try {
@@ -228,6 +228,7 @@ function Profile() {
               <div className="mb-4 flex items-center justify-between">
                 <label
                   htmlFor="verifiedToSell"
+                  //this needs ux/ui update. This is not a user input but appears to be one
                   className="text-lg font-medium text-gray-700"
                 >
                   Verified to Sell
@@ -249,6 +250,7 @@ function Profile() {
                   Verified to Buy
                 </label>
                 <input
+                  //this needs ux/ui update. This is not a user input but appears to be one
                   id="verifiedToBuy"
                   name="verifiedToBuy"
                   type="checkbox"

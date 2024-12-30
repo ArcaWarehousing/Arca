@@ -5,7 +5,7 @@ import Navbar from "../components/nav/navbar";
 import { Searchcheckbox } from "../components/searchitems/searchcheckbox";
 import { Searchselectinput } from "../components/searchitems/searchselectinput";
 import { Searchtextinput } from "../components/searchitems/searchtextinput";
-import current from "../availablespaces.json";
+import current from "../availablespaces.json";//need to replace this to get live warehouse data
 import Listedwarehouse from "../components/warehouses/listedwarehouse";
 import "react-range-slider-input/dist/style.css";
 import { Numberinput } from "../components/searchitems/numberinput";
@@ -33,33 +33,33 @@ const Page = () => {
 
   const authToken = Cookies.get("authToken");
   const router = useRouter();
-  const fetchData = async () => {
-    try {
-      if (!authToken) {
-        console.log("REDIRECTING TO SIGNIN");
-        router.push("/signin");
-      } else {
-        const response = await fetch(
-          process.env.NEXT_PUBLIC_APIROUTE + ":9000/api/user/getProfile",
-          {
-            credentials: "include"
-          }
-        );
+  // const fetchData = async () => {
+  //   try {
+  //     if (!authToken) {
+  //       console.log("REDIRECTING TO SIGNIN");
+  //       router.push("/signin");
+  //     } else {
+  //       const response = await fetch(
+  //         process.env.NEXT_PUBLIC_APIROUTE + ":9000/api/user/getProfile",
+  //         {
+  //           credentials: "include"
+  //         }
+  //       );
 
-        if (response.ok) {
-          const data = await response.json();
-          setUserName(data.email);
+  //       if (response.ok) {
+  //         const data = await response.json();
+  //         setUserName(data.email);
 
-          // Handle insuranceFile if needed
-          console.log("Data fetched successfully", data);
-        } else {
-          console.error("Error fetching data");
-        }
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  //         // Handle insuranceFile if needed
+  //         console.log("Data fetched successfully", data);
+  //       } else {
+  //         console.error("Error fetching data");
+  //       }
+  //     }
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
   const handleForm = async (event: { preventDefault: () => void }) => {
     event.preventDefault();
 
@@ -111,7 +111,7 @@ const Page = () => {
   };
 
   useEffect(() => {
-    fetchData();
+    // fetchData();
   }, []);
   return (
     <div className="flex flex-row w-full h-screen  ">
@@ -294,7 +294,8 @@ const Page = () => {
             Your current warehouses for rent
           </h1>
           <div className="flex flex-col gap-5 mt-7">
-            {current.map((warehouse, key) => (
+            {current.map((warehouse, key) => (//current is an array of current warehouse objects. 
+              //child elemnt
               <Listedwarehouse
                 key={key}
                 access={warehouse.access}

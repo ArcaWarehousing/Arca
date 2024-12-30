@@ -42,6 +42,7 @@ app.get("/versionCheck", function (req, res) {
   res.status(200).send("Version 10");
 });
 
+//Does this actually check if status is protected? test this!
 app.get("/protectedstatus", jwtAuth, function (req, res) {
   console.log(req.uid);
   res.status(200).send("OK");
@@ -60,8 +61,8 @@ app.get("/test", function (req, res) {
 
 // app.get('/protected', cookieJwtAuth, protectedRoute);
 
-// chat stuff
-
+// chat stuff (existing code delete? haven't seen a use case)
+//Should probably be moved
 io.on("connection", (socket) => {
   console.log("Connected to socket.io");
   socket.on("setup", (userData) => {
