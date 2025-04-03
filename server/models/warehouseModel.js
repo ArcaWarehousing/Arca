@@ -14,61 +14,54 @@ db.connect((err) => {
 });
 
 // Function to create a new warehouse
-exports.createWarehouse = (warehouseData, callback) => {
-  const sql = `INSERT INTO warehouses (associated_user, name, street, city, state, zip, description, total_sqft, external_used_sqft, available_sqft, price_per_sqft_per_month, downpayment_percentage, warehouse_type, refrigerated, ceiling_height, loading_docks, security_cameras, security_guards, special_features) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+exports.uploadWarehouse = (warehouseData, callback) => {
+  const sql = `INSERT INTO warehouses (uid, name, location, photos, legalDocuments, refrigerated, size, used, type, costPerMonth, downPaymentPercent, height, docks, cameras, guards, goodsStored) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
   db.query(sql, [
-    warehouseData.associatedUser,
+    warehouseData.uid,
     warehouseData.name,
-    warehouseData.address.street,
-    warehouseData.address.city,
-    warehouseData.address.state,
-    warehouseData.address.zip,
-    warehouseData.description,
-    warehouseData.totalSqft,
-    warehouseData.externalUsedSqft,
-    warehouseData.availableSqft,
-    warehouseData.pricePerSqftPerMonth,
-    warehouseData.downpaymentPercentage,
-    warehouseData.warehouseType,
+    warehouseData.location,
+    warehouseData.photos,
+    warehouseData.legalDocuments,
     warehouseData.refrigerated,
-    warehouseData.ceilingHeight,
-    warehouseData.loadingDocks,
-    warehouseData.securityCameras,
-    warehouseData.securityGuards,
-    warehouseData.specialFeatures
+    warehouseData.size,
+    warehouseData.used,
+    warehouseData.type,
+    warehouseData.costPerMonth,
+    warehouseData.downPaymentPercent,
+    warehouseData.height,
+    warehouseData.docks,
+    warehouseData.cameras,
+    warehouseData.guards,
+    warehouseData.goodsStored
   ], callback);
 };
 
 // Function to find warehouses by user ID
 exports.findWarehousesByUserId = (userId, callback) => {
-  const sql = `SELECT * FROM warehouses WHERE associated_user = ?`;
+  const sql = `SELECT * FROM StorageUnits WHERE uid = ?`;
   db.query(sql, [userId], callback);
 };
 
 // Function to update a warehouse
 exports.updateWarehouse = (warehouseId, warehouseData, callback) => {
-  const sql = `UPDATE warehouses SET name = ?, street = ?, city = ?, state = ?, zip = ?, description = ?, total_sqft = ?, external_used_sqft = ?, available_sqft = ?, price_per_sqft_per_month = ?, downpayment_percentage = ?, warehouse_type = ?, refrigerated = ?, ceiling_height = ?, loading_docks = ?, security_cameras = ?, security_guards = ?, special_features = ? WHERE id = ? AND associated_user = ?`;
+  const sql = `UPDATE StorageUnits SET name = ?, location = ?, photos = ?, legalDocuments = ?, refrigerated = ?, size = ?, used = ?, type = ?, costPerMonth = ?, downPaymentPercent = ?, height = ?, docks = ?, cameras = ?, guards = ?, goodsStored = ? WHERE uid = ?`;
   db.query(sql, [
     warehouseData.name,
-    warehouseData.address.street,
-    warehouseData.address.city,
-    warehouseData.address.state,
-    warehouseData.address.zip,
-    warehouseData.description,
-    warehouseData.totalSqft,
-    warehouseData.externalUsedSqft,
-    warehouseData.availableSqft,
-    warehouseData.pricePerSqftPerMonth,
-    warehouseData.downpaymentPercentage,
-    warehouseData.warehouseType,
+    warehouseData.location,
+    warehouseData.photos,
+    warehouseData.legalDocuments,
     warehouseData.refrigerated,
-    warehouseData.ceilingHeight,
-    warehouseData.loadingDocks,
-    warehouseData.securityCameras,
-    warehouseData.securityGuards,
-    warehouseData.specialFeatures,
-    warehouseId,
-    warehouseData.associatedUser
+    warehouseData.size,
+    warehouseData.used,
+    warehouseData.type,
+    warehouseData.costPerMonth,
+    warehouseData.downPaymentPercent,
+    warehouseData.height,
+    warehouseData.docks,
+    warehouseData.cameras,
+    warehouseData.guards,
+    warehouseData.goodsStored,
+    warehouseId
   ], callback);
 };
 
@@ -87,6 +80,6 @@ exports.uploadPaperwork = (warehouseId, paperworkUrl, callback) => {
 
 // Function to search for warehouses based on criteria
 exports.searchWarehouses = (query, callback) => {
-  const sql = `SELECT * FROM warehouses WHERE name LIKE ? OR city LIKE ? OR state LIKE ? OR zip LIKE ?`;
-  db.query(sql, [`%${query}%`, `%${query}%`, `%${query}%`, `%${query}%`], callback);
+  const sql = `SELECT * FROM StorageUnits WHERE name LIKE ? OR location LIKE ? OR type LIKE ?`;
+  db.query(sql, [`%${query}%`, `%${query}%`, `%${query}%`], callback);
 };

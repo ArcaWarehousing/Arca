@@ -1,10 +1,12 @@
 const jwt = require("jsonwebtoken");
 const yup = require("yup");
 const mysql = require('mysql');
+const cors = require('cors');
 const util = require("util");
 const multer = require("multer");
 const nodemailer = require('nodemailer');
 const { v4: uuidv4 } = require("uuid");
+const path = require('path');
 
 // Establish connection to MySQL database
 const db = mysql.createConnection({
@@ -19,32 +21,16 @@ db.connect((err) => {
   console.log('Connected to MySQL database');
 });
 
-// Function to add if you want a protected route
-
-/*
-const jwtAuth = (req, res, next) => {
-  const token = req.cookies.authToken;
-  try {
-    const user = jwt.verify(token, process.env.SERVER_SECRET_JWT);
-    req.user = user;
-    if (req.user.exp * 10e3 - new Date().getTime() < 0) throw new Error("Token Expired");
-
-    // Check if user exists in MySQL database
-    const sql = `SELECT * FROM users WHERE id = ?`;
-    db.query(sql, [req.user.id], (err, results) => {
-      if (err || results.length === 0) {
-        res.clearCookie("authToken");
-        return res.status(401).send({ message: "Unauthorized: " + token + " or error: " + err.message });
-      }
-      next();
-    });
-  } catch (error) {
-    res.clearCookie("authToken");
-    console.log("redirecting");
-    res.status(401).send({ message: "Unauthorized: " + token + " or error: " + error.message });
-  }
+// CORS configuration
+const corsOptions = {
+  origin: 'http://localhost:3000', // Replace with your frontend's origin
+  methods: ['GET', 'POST'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
 };
-*/
+
+const corsMiddleware = cors(corsOptions);
+
 // Function to validate a schema
 const validate = (schema) => async (req, res, next) => {
   try {
@@ -61,7 +47,7 @@ const validate = (schema) => async (req, res, next) => {
 
 // File uploader class for handling file uploads
 class fileUploader {
-  static imagesOnly = ["image/png", "image/jpg", "image/jpeg"];
+  static imagesOnly = ["image/png", "image/jpg", "image/jpeg", "image/pdf", "image/doc", "image/docx"];
 
   constructor(dbConfig, fileTypes = undefined) {
     this.dbConfig = dbConfig;
@@ -88,6 +74,7 @@ class fileUploader {
             message: "You must select a file.",
           });
         }
+        req.body.filePath = path.join('uploads', req.file.filename); // Add file path to request body
         next();
       } catch (error) {
         return res.status(500).send({ message: error.message });
@@ -173,4 +160,4 @@ const sendEmail = (req) => {
   }
 };
 
-module.exports = { validate, fileUploader, sendEmail };
+module.exports = { validate, corsMiddleware, fileUploader, sendEmail };

@@ -28,7 +28,7 @@ const Page = () => {
   const [height, setHeight] = useState(null);
   const [docks, setDocks] = useState(null);
   const [cameras, setCameras] = useState(false);
-  const [gaurds, setGaurds] = useState(false);
+  const [guards, setguards] = useState(false);
   const [goods, setGoods] = useState("");
 
   const authToken = Cookies.get("authToken");
@@ -57,18 +57,21 @@ const Page = () => {
       console.log(error);
     }
   };
-  const handleForm = async (event: { preventDefault: () => void }) => {
-    event.preventDefault();
 
+  const handleForm = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    console.log("form submitted")
+    console.log({legal})
     try {
       const response = await fetch(
-        process.env.NEXT_PUBLIC_APIROUTE + ":9000/api/uploadWarehouse",
+        process.env.NEXT_PUBLIC_APIROUTE + ":9000/warehouses/uploadWarehouse",
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json"
           },
           body: JSON.stringify({
+            uid : 1,
             name: name,
             location: location,
             photos: photos,
@@ -76,13 +79,13 @@ const Page = () => {
             refrigerated: refrigerated,
             size: size,
             used: used,
-            tyep: type,
+            type: type,
             costPerMonth: permonth,
             downPaymentPercent: down,
             height: height,
             docks: docks,
             cameras: cameras,
-            gaurds: gaurds,
+            guards: guards,
             goodsStored: goods
           })
         }
@@ -124,7 +127,7 @@ const Page = () => {
             <h4 className="text-xl font-light mt-5 ">
               Please input your warehouses information below.
             </h4>
-            <form className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4  place-items-center relative  p-6 px-4 mx-12 sm:px-6 lg:px-8   py-10   gap-10">
+            <form className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4  place-items-center relative  p-6 px-4 mx-12 sm:px-6 lg:px-8   py-10   gap-10" onSubmit={(e) => handleForm(e)}>
               <Searchtextinput
                 state={name}
                 setState={setName}
@@ -192,15 +195,11 @@ const Page = () => {
                     />
                   </svg>
                 </label>
-                <input
-                  id="file-upload"
-                  type="file"
-                  placeholder="photos"
-                  onChange={(e) =>
-                    setLegal((e.target.files && e.target.files[0]) || null)
-                  }
-                  accept=".pdf,.doc,.docx"
-                />
+                <input type="file" onChange={(e) => {
+                  const file = e.target.files ? e.target.files[0] : null;
+                  console.log('Selected legal file:', file);
+                  setLegal(file);
+                }} />
               </div>
               <Searchcheckbox
                 singlestate={refrigerated}
@@ -265,10 +264,10 @@ const Page = () => {
                 setSingleState={setCameras}
               />
               <Searchcheckbox
-                title="Security Gaurds"
-                options={["Security Gaurds"]}
-                singlestate={gaurds}
-                setSingleState={setGaurds}
+                title="Security guards"
+                options={["Security guards"]}
+                singlestate={guards}
+                setSingleState={setguards}
               />
               <Searchtextinput
                 title="List of Goods Stored"
@@ -279,7 +278,6 @@ const Page = () => {
               <button
                 className="mt-2 w-[80%] max-w-[500px] col-span-full   px-4 py-2 bg-indigo-600 text-white rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                 type="submit"
-                onSubmit={(e) => handleForm(e)}
               >
                 Upload
               </button>

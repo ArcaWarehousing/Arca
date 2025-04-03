@@ -20,7 +20,7 @@ const warehouseFileUploader = new fileUploader(warehousesVerificationPaperworkDb
 // Define routes for warehouse operations
 router.post('/uploadWarehouse', warehousesCtrler.uploadWarehouse);
 router.get('/getUserWarehouses', warehousesCtrler.getUserWarehouses);
-router.put('/updateWarehouse/', warehousesCtrler.updateUserWarehouses);
+router.put('/updateWarehouse/:warehouseId', warehousesCtrler.updateUserWarehouses);
 
 router.put('/uploadPaperwork/:warehouseId', warehouseFileUploader.upload, warehousesCtrler.uploadPaperwork);
 router.get('/downloadPaperwork/:name', warehouseFileUploader.download);
@@ -28,7 +28,6 @@ router.get('/downloadPaperwork/:name', warehouseFileUploader.download);
 router.put('/uploadImages/:warehouseId', warehouseImageFileUploader.uploadMultiple, warehousesCtrler.uploadPictures);
 router.get('/downloadImages/:name', warehouseImageFileUploader.download);
 
-router.get('/requestVerification/:warehouseId', warehousesCtrler.requestVerification);
-router.post('/search', warehousesCtrler.search);
+router.post('/search', warehousesCtrler.searchWarehouses);
 
 module.exports = router;
