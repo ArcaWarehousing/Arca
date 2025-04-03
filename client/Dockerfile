@@ -6,7 +6,7 @@ WORKDIR /app
 
 COPY package.json ./
 
-RUN npm update && npm ci
+RUN npm update && npm install
 # was npm install
 
 # If you want yarn update and  install uncomment the bellow

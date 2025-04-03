@@ -12,6 +12,7 @@
     "@stripe/react-stripe-js": "^2.7.3",
     "@stripe/stripe-js": "^4.2.0",
     "axios": "^1.7.2",
+    "firebase": "^11.6.0",
     "framer-motion": "^11.2.10",
     "hamburger-react": "^2.5.1",
     "js-cookie": "^3.0.5",

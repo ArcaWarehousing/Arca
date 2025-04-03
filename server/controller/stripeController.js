@@ -1,101 +1,60 @@
-const Stripe = require('stripe');
+const stripe = require('stripe')('sk_test_51R9CTqEyfWmQhA49gpd5BnyiLLlsCFwSMXcQu6aRiTCCqQhJUwtielZSUdrgxyeHOk13SsMKix7WvvnWDGWkANyS00eL154DJ0');
 
-
-const stripe = new Stripe(process.env.STRIPE_KEY_SECRET);
-
-exports.createCustomer = async (req, res) => {
-  console.log("CREATING A CUSTOMER!");
-  const customer = await stripe.customers.create({
-    name: 'Jenny Rosen',
-    email: 'jennyrosen@example.com',
-  });
-  console.log(customer)
-  res.send(200);
-};
-
-exports.createPaymentMethod = async (req, res) => {
-  console.log("CREATING A PAYMENT METHOD!");
+exports.createCheckoutSession = async (req, res) => {
+  console.log("CREATING A CHECKOUT SESSION!");
   try {
-    const { customerId } = req.body;
+    const { lineItems, successUrl, cancelUrl } = req.body;
 
-    const paymentMethod = await stripe.paymentMethods.create({
-      type: 'card',
-      card: {
-        number: '1234123412341234',
-        exp_month: 12,
-        exp_year: 2024,
-        cvc: '123',
-      },
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      line_items: lineItems,
+      mode: 'payment',
+      success_url: successUrl,
+      cancel_url: cancelUrl,
     });
 
-    await stripe.paymentMethods.attach(paymentMethod.id, {
-      customer: customerId,
-    });
-    console.log(paymentMethod.id)
-
-    res.status(200).send({paymentId: paymentMethod.id});
+    res.status(200).json({ url: session.url });
+    console.log("CREATING A CHECKOUT SESSION!");
   } catch (error) {
+    console.error("Error creating checkout session:", error);
     res.status(500).json({ error: error.message });
   }
 };
 
-exports.savePaymentMethod = async (req, res) => {
-    console.log("SAVING PAYMENT METHODS2!");
-    try {
-      const { paymentId, customerId, type } = req.body; 
+exports.retrieveCheckoutSession = async (req, res) => {
+  console.log("RETRIEVING CHECKOUT SESSION!");
+  try {
+    const { sessionId } = req.params;
 
-      if(!paymentId || !customerId){
-        return res.stats(400).json({error: 'need payment and customer IDs'})
-      }
-      const connectedAccount = "acct_1PgI70Q88yl1lgI4";
-
-      let paymentMethod
-      try{
-        paymentMethod = await stripe.paymentMethods.retrieve(paymentId, {connectedAccount,})
-      } catch(error){
-        return res.status(404).json({error: 'no payment method'})
-      }
-
-      try{
-        await stripe.paymentMethods.attach(paymentId, {
-        customer: customerId,
-        connectedAccount,
-      });
-    }catch(error){
-      return res.status(404).json({error: 'payment method not attached'})
-    }
-     
-      await stripe.customers.update(customerId, {
-        invoice_settings: {
-          default_payment_method: paymentMethod.id,
-        },
-        connectedAccount,
-      });
-  
-      res.status(200).json({ paymentId: paymentMethod.id });
-    } catch (error) {
-      res.status(500).json({ error: error.message });
-    }
-  };
-
-  exports.chargePayment = async(req,res) =>{
-    console.log("CHARGING PAYMENT METHODS!");
-    try {
-        const { amount, currency, customerId, paymentId } = req.body;
-    
-    
-        const paymentIntent = await stripe.paymentIntents.create({
-          
-          amount,
-          currency,
-          customer: customerId,
-          payment_method: paymentId,
-          off_session: true,
-          confirm: true,
-        });
-    
-        res.status(200).json({ paymentIntentId: paymentIntent.id });
-      } catch (error) {
-        res.status(500).json({ error: error.message });
-      }
+    const session = await stripe.checkout.sessions.retrieve(sessionId);
+    res.status(200).json(session);
+  } catch (error) {
+    console.error("Error retrieving checkout session:", error);
+    res.status(500).json({ error: error.message });
   }
+};
+
+exports.handleWebhook = async (req, res) => {
+  const sig = req.headers['stripe-signature'];
+  let event;
+
+  try {
+    event = stripe.webhooks.constructEvent(req.body, sig, 'your-webhook-secret');
+  } catch (err) {
+    console.error(`Webhook Error: ${err.message}`);
+    return res.status(400).send(`Webhook Error: ${err.message}`);
+  }
+
+  switch (event.type) {
+    case 'checkout.session.completed':
+      const session = event.data.object;
+      console.log(`Checkout session completed: ${session.id}`);
+      // Fulfill the purchase...
+      break;
+    // Handle other event types
+    default:
+      console.log(`Unhandled event type ${event.type}`);
+  }
+
+  res.json({ received: true });
+};

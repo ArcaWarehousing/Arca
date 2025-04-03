@@ -35,10 +35,7 @@ const Page = () => {
   const router = useRouter();
   const fetchData = async () => {
     try {
-      if (!authToken) {
-        console.log("REDIRECTING TO SIGNIN");
-        router.push("/signin");
-      } else {
+       {
         const response = await fetch(
           process.env.NEXT_PUBLIC_APIROUTE + ":9000/api/user/getProfile",
           {
