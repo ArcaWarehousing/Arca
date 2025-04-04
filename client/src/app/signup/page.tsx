@@ -1,16 +1,14 @@
 "use client";
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-const Cookies = require("js-cookie");
+import { signIn } from "next-auth/react"; // const Cookies = require("js-cookie");
 
 function Page() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState<null | string>(null);
-  const router = useRouter();
-  if(Cookies.get("authToken")) router.push("/welcome");
-  // console.log("Process: " + process.env.NEXT_PUBLIC_APIROUTE);
 
   const handleForm = async (event: { preventDefault: () => void }) => {
     event.preventDefault();
@@ -28,7 +26,7 @@ function Page() {
         body: JSON.stringify({
           email: email,
           password: password,
-          rememberMe: true,
+          confirmPassword: confirmPassword
         }),
       });
 
@@ -37,9 +35,15 @@ function Page() {
         return setError(errorData.message || "Failed to create account");
       }
 
-      const data = await response.json();
-      console.log(data);
-      Cookies.set("authToken", data.token);
+      const result = await signIn('credentials', {
+        redirect: false,
+        email,
+        password,
+      });
+
+      if (result?.error) {
+        return setError(result.error);
+      }
 
       router.push("/profile");
     } catch (error) {

@@ -1,6 +1,8 @@
 {
   "dependencies": {
     "@tsparticles/react": "^3.0.0",
-    "@tsparticles/slim": "^3.5.0"
+    "@tsparticles/slim": "^3.5.0",
+    "next-auth": "^4.24.11",
+    "oracledb": "^6.8.0"
   }
 }

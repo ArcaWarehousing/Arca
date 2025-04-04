@@ -5,6 +5,7 @@ const util = require("util");
 const multer = require("multer");
 const nodemailer = require('nodemailer');
 const { v4: uuidv4 } = require("uuid");
+const { verifyToken } = require('./utils/jwtUtil');
 
 // Establish connection to MySQL database
 const db = mysql.createConnection({
@@ -19,8 +20,23 @@ db.connect((err) => {
   console.log('Connected to MySQL database');
 });
 
-// Function to add if you want a protected route
-
+const jwtAuth = (req, res, next) => {
+  const authHeader = req.headers.authorization;
+  
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ message: 'Authentication token required' });
+  }
+  
+  const token = authHeader.split(' ')[1];
+  const decoded = verifyToken(token);
+  
+  if (!decoded) {
+    return res.status(401).json({ message: 'Invalid or expired token' });
+  }
+  
+  req.user = decoded;
+  next();
+};
 /*
 const jwtAuth = (req, res, next) => {
   const token = req.cookies.authToken;
@@ -60,88 +76,88 @@ const validate = (schema) => async (req, res, next) => {
 };
 
 // File uploader class for handling file uploads
-class fileUploader {
-  static imagesOnly = ["image/png", "image/jpg", "image/jpeg"];
+// class fileUploader {
+//   static imagesOnly = ["image/png", "image/jpg", "image/jpeg"];
 
-  constructor(dbConfig, fileTypes = undefined) {
-    this.dbConfig = dbConfig;
+//   constructor(dbConfig, fileTypes = undefined) {
+//     this.dbConfig = dbConfig;
 
-    // Configure multer storage
-    this.storage = multer.diskStorage({
-      destination: (req, file, cb) => {
-        cb(null, 'uploads/');
-      },
-      filename: (req, file, cb) => {
-        const filename = `${uuidv4()}-file-${file.originalname}`;
-        cb(null, filename);
-      }
-    });
+//     // Configure multer storage
+//     this.storage = multer.diskStorage({
+//       destination: (req, file, cb) => {
+//         cb(null, 'uploads/');
+//       },
+//       filename: (req, file, cb) => {
+//         const filename = `${uuidv4()}-file-${file.originalname}`;
+//         cb(null, filename);
+//       }
+//     });
 
-    this.uploadFiles = multer({ storage: this.storage }).single("file");
-    this.uploadFilesMiddleware = util.promisify(this.uploadFiles);
+//     this.uploadFiles = multer({ storage: this.storage }).single("file");
+//     this.uploadFilesMiddleware = util.promisify(this.uploadFiles);
 
-    this.upload = async (req, res, next) => {
-      try {
-        await this.uploadFilesMiddleware(req, res);
-        if (req.file == undefined) {
-          return res.send({
-            message: "You must select a file.",
-          });
-        }
-        next();
-      } catch (error) {
-        return res.status(500).send({ message: error.message });
-      }
-    };
+//     this.upload = async (req, res, next) => {
+//       try {
+//         await this.uploadFilesMiddleware(req, res);
+//         if (req.file == undefined) {
+//           return res.send({
+//             message: "You must select a file.",
+//           });
+//         }
+//         next();
+//       } catch (error) {
+//         return res.status(500).send({ message: error.message });
+//       }
+//     };
 
-    // Max of 10 uploaded files also for images
-    this.uploadMultipleFiles = multer({ storage: this.storage }).array("file", 10);
-    this.uploadMultipleFilesMiddleware = util.promisify(this.uploadMultipleFiles);
-    this.uploadMultiple = async (req, res, next) => {
-      try {
-        await this.uploadMultipleFilesMiddleware(req, res);
-        if (req.files.length <= 0) {
-          return res.status(400).send({ message: "You must upload at least 1 file." });
-        }
-        next();
-      } catch (error) {
-        return res.status(500).send({ message: error.message });
-      }
-    };
+//     // Max of 10 uploaded files also for images
+//     this.uploadMultipleFiles = multer({ storage: this.storage }).array("file", 10);
+//     this.uploadMultipleFilesMiddleware = util.promisify(this.uploadMultipleFiles);
+//     this.uploadMultiple = async (req, res, next) => {
+//       try {
+//         await this.uploadMultipleFilesMiddleware(req, res);
+//         if (req.files.length <= 0) {
+//           return res.status(400).send({ message: "You must upload at least 1 file." });
+//         }
+//         next();
+//       } catch (error) {
+//         return res.status(500).send({ message: error.message });
+//       }
+//     };
 
-    this.getList = async (req, res) => {
-      try {
-        const sql = `SELECT * FROM ${this.dbConfig.fileBucket}`;
-        db.query(sql, (err, results) => {
-          if (err || results.length === 0) {
-            return res.status(500).send({ message: "No files found!" });
-          }
-          let fileInfos = results.map(doc => ({
-            name: doc.filename,
-            url: process.env.API_ROUTE + this.dbConfig.baseUrl + doc.filename,
-          }));
-          return res.status(200).send(fileInfos);
-        });
-      } catch (error) {
-        return res.status(500).send({ message: error.message });
-      }
-    };
+//     this.getList = async (req, res) => {
+//       try {
+//         const sql = `SELECT * FROM ${this.dbConfig.fileBucket}`;
+//         db.query(sql, (err, results) => {
+//           if (err || results.length === 0) {
+//             return res.status(500).send({ message: "No files found!" });
+//           }
+//           let fileInfos = results.map(doc => ({
+//             name: doc.filename,
+//             url: process.env.API_ROUTE + this.dbConfig.baseUrl + doc.filename,
+//           }));
+//           return res.status(200).send(fileInfos);
+//         });
+//       } catch (error) {
+//         return res.status(500).send({ message: error.message });
+//       }
+//     };
 
-    this.download = async (req, res) => {
-      try {
-        const fileName = req.params.name;
-        const filePath = `uploads/${fileName}`;
-        res.download(filePath, (err) => {
-          if (err) {
-            return res.status(404).send({ message: err.message });
-          }
-        });
-      } catch (error) {
-        return res.status(500).send({ message: error.message });
-      }
-    };
-  }
-}
+//     this.download = async (req, res) => {
+//       try {
+//         const fileName = req.params.name;
+//         const filePath = `uploads/${fileName}`;
+//         res.download(filePath, (err) => {
+//           if (err) {
+//             return res.status(404).send({ message: err.message });
+//           }
+//         });
+//       } catch (error) {
+//         return res.status(500).send({ message: error.message });
+//       }
+//     };
+//   }
+// }
 
 // Configure nodemailer for sending emails
 const transporter = nodemailer.createTransport({

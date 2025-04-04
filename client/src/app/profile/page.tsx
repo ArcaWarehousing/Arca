@@ -1,11 +1,13 @@
 "use client";
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import Navbar from "../components/nav/navbar";
 import Sidebar from "../components/sidebar";
-const Cookies = require("js-cookie");
+// const Cookies = require("js-cookie");
 
 function Profile() {
+  const router = useRouter();
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
@@ -15,20 +17,23 @@ function Profile() {
   const [verifiedToBuy, setVerifiedToBuy] = useState(false);
   const [insuranceFile, setInsuranceFile] = useState<File | null>(null);
   const [verificationRequested, setVerificationRequested] = useState(false);
-  const router = useRouter();
 
-  const authToken = Cookies.get("authToken");
+  const { data: session, status } = useSession();
 
   const fetchData = useCallback(async () => {
     try {
-      if (!authToken) {
-        console.log("REDIRECTING TO SIGNIN");
+      if (status === "unauthenticated") {
         router.push("/signin");
-      } else {
+        return;
+      }
+      
+      if (status === "authenticated") {
         const response = await fetch(
           process.env.NEXT_PUBLIC_APIROUTE + ":9000/api/user/getProfile",
           {
-            credentials: "include",
+            headers: {
+              Authorization: `Bearer ${session.accessToken}`,
+            },
           }
         );
 
@@ -42,7 +47,6 @@ function Profile() {
           setVerifiedToSell(data.verifiedToSell);
           setVerifiedToBuy(data.verifiedToBuy);
           setVerificationRequested(data.verificationRequested);
-          // Handle insuranceFile if needed
           console.log("Data fetched successfully", data);
         } else {
           console.error("Error fetching data");
@@ -51,7 +55,7 @@ function Profile() {
     } catch (error) {
       console.log(error);
     }
-  }, [authToken, router]);
+  }, [status, session, router]);
 
   useEffect(() => {
     fetchData();
@@ -88,7 +92,7 @@ function Profile() {
           body: JSON.stringify(data),
         }
       );
-
+      // TODO: Insurance validation
       if (response.ok) {
         const responseData = await response.json();
         // console.log("Profile updated successfully", responseData);
@@ -119,7 +123,7 @@ function Profile() {
   };
 
   
-
+  // TODO: Scope and implement
   const requestVerification = async () => {
     try {
       const response = await fetch(
